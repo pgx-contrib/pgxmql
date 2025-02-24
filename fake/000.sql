@@ -4,4 +4,4 @@
 
 -- name: first
 SELECT name FROM users;
--- WHERE :condition AND x = 1;
+-- WHERE :condition;

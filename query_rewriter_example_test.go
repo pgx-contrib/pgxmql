@@ -35,7 +35,7 @@ func ExampleQueryRewriter() {
 
 	rows, err := pool.Query(ctx,
 		"SELECT * from user -- WHERE :condition",
-		pgxfilter.New[User](
+		pgxfilter.NewQueryRewriter[User](
 			"role = 'admin'",
 		),
 	)

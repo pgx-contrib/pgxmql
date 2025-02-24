@@ -10,8 +10,9 @@ import (
 )
 
 var _ = Describe("QueryRewriter", func() {
-	var rewriter *pgxfilter.QueryRewriter
+	var filter *pgxfilter.QueryRewriter
 
+	// User is a struct that represents a user in the database
 	type User struct {
 		ID    int    `db:"id"`
 		Perm  int    `db:"perm"`
@@ -20,15 +21,18 @@ var _ = Describe("QueryRewriter", func() {
 		Group string `db:"-"`
 	}
 
+	// NewUserFilter is a helper function to create a new QueryRewriter for the User struct
+	NewUserFilter := pgxfilter.NewQueryRewriter[User]
+
 	BeforeEach(func() {
-		rewriter = pgxfilter.New[User]("role = 'admin'")
+		filter = NewUserFilter("role = 'admin'")
 	})
 
 	Describe("RewriteQuery", func() {
 		It("should rewrite the query with the filter", func(ctx SpecContext) {
 			query := NewFakeQuery("000.sql")
 
-			querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+			querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(querySQL).To(ContainSubstring("role = $1"))
 			Expect(queryArgs).To(HaveLen(1))
@@ -39,8 +43,8 @@ var _ = Describe("QueryRewriter", func() {
 			It("returns an error", func(ctx SpecContext) {
 				query := NewFakeQuery("000.sql")
 
-				rewriter = pgxfilter.New[User]("company = 'IBM'")
-				querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				filter = NewUserFilter("company = 'IBM'")
+				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).To(HaveOccurred())
 				Expect(querySQL).To(BeEmpty())
 				Expect(queryArgs).To(BeEmpty())
@@ -51,7 +55,7 @@ var _ = Describe("QueryRewriter", func() {
 			It("should rewrite the query with the filter", func(ctx SpecContext) {
 				query := NewFakeQuery("001.sql", 0, "root", 0)
 
-				querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(querySQL).To(ContainSubstring("role = $4"))
 				Expect(queryArgs).To(HaveLen(4))
@@ -63,7 +67,7 @@ var _ = Describe("QueryRewriter", func() {
 			It("should rewrite the query with the filter", func(ctx SpecContext) {
 				query := NewFakeQuery("010.sql", 0, "root", 0)
 
-				querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(querySQL).To(ContainSubstring("role = $4"))
 				Expect(queryArgs).To(HaveLen(4))
@@ -75,7 +79,7 @@ var _ = Describe("QueryRewriter", func() {
 			It("should rewrite the query with the filter", func(ctx SpecContext) {
 				query := NewFakeQuery("100.sql", 0, "root", 0)
 
-				querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(querySQL).To(ContainSubstring("role = $4"))
 				Expect(queryArgs).To(HaveLen(4))
@@ -88,7 +92,7 @@ var _ = Describe("QueryRewriter", func() {
 				query := &pgx.QueuedQuery{
 					SQL: "SELECT * FROM users",
 				}
-				querySQL, queryArgs, err := rewriter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(querySQL).To(Equal(query.SQL))
 				Expect(queryArgs).To(BeEmpty())

@@ -19,8 +19,8 @@ type QueryRewriter struct {
 	typ  any
 }
 
-// New creates a new QueryRewriter.
-func New[T any](expr string) *QueryRewriter {
+// NewQueryRewriter creates a new QueryRewriter.
+func NewQueryRewriter[T any](expr string) *QueryRewriter {
 	var typ T
 
 	return &QueryRewriter{
