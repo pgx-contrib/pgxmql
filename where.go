@@ -59,7 +59,7 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 }
 
 func (x *WhereClause) condition(query string) string {
-	return strings.Replace(query, "$1::void IS NULL", "-- :condition", 1)
+	return strings.Replace(query, "$1::void IS NULL", "TRUE", 1)
 }
 
 func (x *WhereClause) parameters(query string, value int) string {
