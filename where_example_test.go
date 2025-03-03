@@ -10,7 +10,7 @@ import (
 	"github.com/pgx-contrib/pgxfilter"
 )
 
-func ExampleQueryRewriter() {
+func ExampleWhereClause() {
 	type User struct {
 		ID    int    `db:"id"`
 		Perm  int    `db:"perm"`
@@ -34,10 +34,11 @@ func ExampleQueryRewriter() {
 	defer pool.Close()
 
 	rows, err := pool.Query(ctx,
-		"SELECT * from user -- WHERE :condition",
-		pgxfilter.NewQueryRewriter[User](
-			"role = 'admin'",
-		),
+		"SELECT * from user WHERE $1:void IS NULL",
+		&pgxfilter.WhereClause{
+			Condition: "role = 'admin'",
+			Model:     User{},
+		},
 	)
 	if err != nil {
 		panic(err)
