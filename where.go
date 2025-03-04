@@ -75,6 +75,9 @@ func (x *WhereClause) options() []mql.Option {
 		// Iterate over struct fields
 		for i := range t.NumField() {
 			field := t.Field(i)
+			if tag := field.Tag.Get("json"); tag != "" && tag != "-" {
+				field.Name = tag
+			}
 
 			if tag := field.Tag.Get("db"); tag != "" && tag != "-" {
 				include[field.Name] = tag
@@ -83,6 +86,9 @@ func (x *WhereClause) options() []mql.Option {
 			}
 		}
 	}
+
+	fmt.Println("MAPPING")
+	fmt.Println(include)
 
 	return []mql.Option{
 		mql.WithPgPlaceholders(),
