@@ -60,42 +60,12 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 	return query, args, nil
 }
 
-func (x *WhereClause) options() []mql.Option {
-	include := make(map[string]string)
-	columns := []string{}
-
-	// Get the type of the struct
-	t := reflect.TypeOf(x.Model)
-	// obtain the underlying type if it's a pointer
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-	// Ensure it's a struct
-	if t.Kind() == reflect.Struct {
-		// Iterate over struct fields
-		for i := range t.NumField() {
-			field := t.Field(i)
-			if value := field.Tag.Get("json"); value != "" && value != "-" {
-				field.Name = value
-			}
-
-			if value := field.Tag.Get("db"); value != "" && value != "-" {
-				include[field.Name] = value
-			} else {
-				columns = append(columns, field.Name)
-			}
-		}
-	}
-
-	return []mql.Option{
-		mql.WithPgPlaceholders(),
-		mql.WithTableColumnMap(include),
-		mql.WithIgnoredFields(columns...),
-	}
-}
-
 func (x *WhereClause) replaceVoid(query string) string {
 	return strings.Replace(query, "$1::void IS NULL", "-- :condition", 1)
+}
+
+func (x *WhereClause) replaceCond(query string, condition string) string {
+	return strings.Replace(query, "-- :condition", condition, 1)
 }
 
 func (x *WhereClause) replaceArgs(query string, delta int) string {
@@ -113,6 +83,39 @@ func (x *WhereClause) replaceArgs(query string, delta int) string {
 	})
 }
 
-func (x *WhereClause) replaceCond(query string, condition string) string {
-	return strings.Replace(query, "-- :condition", condition, 1)
+func (x *WhereClause) options() []mql.Option {
+	include := make(map[string]string)
+	exclude := []string{}
+
+	// Get the type of the struct
+	t := reflect.TypeOf(x.Model)
+	// obtain the underlying type if it's a pointer
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	// Ensure it's a struct
+	if t.Kind() == reflect.Struct {
+		// Iterate over struct fields
+		for i := range t.NumField() {
+			field := t.Field(i)
+
+			// let's find the column name
+			column := field.Tag.Get("db")
+			if column != "" && column != "-" {
+				// let's find the json property
+				property := field.Tag.Get("json")
+				if property != "" && property != "-" {
+					include[property] = column
+				}
+			} else {
+				exclude = append(exclude, field.Name)
+			}
+		}
+	}
+
+	return []mql.Option{
+		mql.WithPgPlaceholders(),
+		mql.WithTableColumnMap(include),
+		mql.WithIgnoredFields(exclude...),
+	}
 }
