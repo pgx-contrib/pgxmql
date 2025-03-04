@@ -1596,8 +1596,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
-github.com/hashicorp/mql v0.1.4 h1:6ivb4DDJk1/OcEbuHM+976SJlCOsC8F9Dqg2UTBRtIM=
-github.com/hashicorp/mql v0.1.4/go.mod h1:95bDX8gpwGlRRN/IG8FCTwxH6Uy5PV2x+8FrdBxYqF0=
+github.com/hashicorp/mql v0.1.5-0.20250304142029-e49b37f624f8 h1:Njm1jk+lmbUE50y/BNrQa1a6cSGca/JCoW9SDLap6Yc=
+github.com/hashicorp/mql v0.1.5-0.20250304142029-e49b37f624f8/go.mod h1:95bDX8gpwGlRRN/IG8FCTwxH6Uy5PV2x+8FrdBxYqF0=
 github.com/hhatto/gocloc v0.5.3 h1:nDlTJ8FFG2pn7GD/OLbP1fjTFeIRxLF3S3usp3lZMZE=
 github.com/hhatto/gocloc v0.5.3/go.mod h1:pTtvBwdm0Mhqjkqu1g9uXplkncP/CHnhhDOigLj9/ek=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
