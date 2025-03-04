@@ -36,14 +36,15 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 		// parse the filter expression
 		clause, err := mql.Parse(x.Condition, x.Model, x.ignore(), x.placeholder())
 		if err != nil {
-			err = &pgconn.PgError{
+			cause := fmt.Errorf("cause: %w query: %v filter: %v", err, query, x.Condition)
+
+			return "", nil, &pgconn.PgError{
 				Severity:      "ERROR",
 				Code:          "42601",
-				InternalQuery: query,
 				Where:         x.Condition,
-				Message:       err.Error(),
+				Message:       cause.Error(),
+				InternalQuery: query,
 			}
-			return "", nil, err
 		}
 
 		if strings.Contains(query, "$1") {
