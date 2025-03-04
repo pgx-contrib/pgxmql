@@ -34,7 +34,7 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 
 	if x.Condition != "" {
 		// parse the filter expression
-		clause, err := mql.Parse(x.Condition, x.Model, x.ignore(), x.placeholder())
+		clause, err := mql.Parse(x.Condition, x.Model, x.options()...)
 		if err != nil {
 			return "", nil, &pgconn.PgError{
 				Severity:      "ERROR",
@@ -60,30 +60,7 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 	return query, args, nil
 }
 
-func (x *WhereClause) replaceVoid(query string) string {
-	return strings.Replace(query, "$1::void IS NULL", "-- :condition", 1)
-}
-
-func (x *WhereClause) replaceArgs(query string, delta int) string {
-	// Regular expression to match $ followed by a number
-	re := regexp.MustCompile(`\$(\d+)`)
-
-	// Replace function to decrement the numbers
-	return re.ReplaceAllStringFunc(query, func(match string) string {
-		// Extract the number from the match
-		position, _ := strconv.Atoi(match[1:])
-		// next value
-		value := position + delta
-		// Decrement and return the new parameter
-		return fmt.Sprintf("$%d", value)
-	})
-}
-
-func (x *WhereClause) replaceCond(query string, condition string) string {
-	return strings.Replace(query, "-- :condition", condition, 1)
-}
-
-func (x *WhereClause) ignore() mql.Option {
+func (x *WhereClause) options() []mql.Option {
 	include := make(map[string]string)
 	columns := []string{}
 
@@ -107,9 +84,32 @@ func (x *WhereClause) ignore() mql.Option {
 		}
 	}
 
-	return mql.WithIgnoredFields(columns...)
+	return []mql.Option{
+		mql.WithPgPlaceholders(),
+		mql.WithColumnMap(include),
+		mql.WithIgnoredFields(columns...),
+	}
 }
 
-func (x *WhereClause) placeholder() mql.Option {
-	return mql.WithPgPlaceholders()
+func (x *WhereClause) replaceVoid(query string) string {
+	return strings.Replace(query, "$1::void IS NULL", "-- :condition", 1)
+}
+
+func (x *WhereClause) replaceArgs(query string, delta int) string {
+	// Regular expression to match $ followed by a number
+	re := regexp.MustCompile(`\$(\d+)`)
+
+	// Replace function to decrement the numbers
+	return re.ReplaceAllStringFunc(query, func(match string) string {
+		// Extract the number from the match
+		position, _ := strconv.Atoi(match[1:])
+		// next value
+		value := position + delta
+		// Decrement and return the new parameter
+		return fmt.Sprintf("$%d", value)
+	})
+}
+
+func (x *WhereClause) replaceCond(query string, condition string) string {
+	return strings.Replace(query, "-- :condition", condition, 1)
 }
