@@ -10,16 +10,16 @@ import (
 
 var _ = Describe("WhereClause", func() {
 	type User struct {
-		ID       string `db:"id"`
-		Role     string `db:"role"`
-		Password string `db:"password"`
-		Company  string `db:"-"`
+		ID       string `db:"id" json:"id"`
+		Role     string `db:"role" json:"role"`
+		Password string `db:"password" json:"password"`
+		Company  string `db:"-" json:"company"`
 	}
 
-	var filter *pgxfilter.WhereClause
+	var clause *pgxfilter.WhereClause
 
 	BeforeEach(func() {
-		filter = &pgxfilter.WhereClause{
+		clause = &pgxfilter.WhereClause{
 			Condition: "role = 'admin'",
 			Model:     &User{},
 		}
@@ -28,21 +28,35 @@ var _ = Describe("WhereClause", func() {
 	Describe("RewriteQuery", func() {
 		It("rewrites the query successfully", func(ctx SpecContext) {
 			query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
-			querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+			querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(querySQL).To(ContainSubstring("role=$5"))
 			Expect(queryArgs).To(HaveLen(5))
 			Expect(queryArgs).To(ContainElement("admin"))
 		})
 
+		When("the expression is empty", func() {
+			BeforeEach(func() {
+				clause.Condition = ""
+			})
+
+			It("rewrites the query successfully", func(ctx SpecContext) {
+				query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
+				querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(querySQL).To(ContainSubstring("TRUE"))
+				Expect(queryArgs).To(HaveLen(4))
+			})
+		})
+
 		When("the expression is invalid", func() {
 			BeforeEach(func() {
-				filter.Condition = "first_name = 'John'"
+				clause.Condition = "first_name = 'John'"
 			})
 
 			It("returns an error", func(ctx SpecContext) {
 				query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
-				querySQL, queryArgs, err := filter.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+				querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
 				Expect(err).To(MatchError(ContainSubstring(`invalid column "first_name"`)))
 				Expect(querySQL).To(BeEmpty())
 				Expect(queryArgs).To(BeEmpty())
