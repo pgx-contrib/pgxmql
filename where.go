@@ -24,7 +24,7 @@ type WhereClause struct {
 }
 
 // RewriteQuery implements pgx.QueryRewriter.
-func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query string, args []any) (_ string, _ []any, err error) {
+func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query string, args []any) (string, []any, error) {
 	// prepare the query
 	query = x.replaceVoid(query)
 	// if we don't have a placeholder, we need to decrement the query parameters
