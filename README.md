@@ -3,8 +3,8 @@
 [![reference](https://pkg.go.dev/badge/github.com/pgx-contrib/pgxfilter.svg)](https://pkg.go.dev/github.com/pgx-contrib/pgxfilter)
 [![coverage](.github/coverage.svg)](./README.md)
 
-An adapter that enable [hashicorp/mql](https://github.com/hashicorp/mql) to
-work with [pgx](https://github.com/jackc/pgx) and
+An adapter that enables [hashicorp/mql](https://github.com/hashicorp/mql) for
+[pgx](https://github.com/jackc/pgx) and
 [sqlc](https://github.com/sqlc-dev/sqlc).
 
 ## Getting Started
