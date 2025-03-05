@@ -10,17 +10,17 @@ import (
 
 var _ = Describe("WhereClause", func() {
 	type User struct {
-		ID       string `db:"id" json:"id"`
-		Role     string `db:"role" json:"role"`
-		Password string `db:"password" json:"password"`
-		Company  string `db:"-" json:"company"`
+		ID       string `db:"id_db"`
+		Role     string `db:"role_db"`
+		Password string `db:"-"`
+		Company  string `db:"company_db" json:"company_json"`
 	}
 
 	var clause *pgxmql.WhereClause
 
 	BeforeEach(func() {
 		clause = &pgxmql.WhereClause{
-			Condition: "role = 'admin'",
+			Condition: "role = 'root' and company_json % 'TSLA'",
 			Model:     &User{},
 		}
 	})
@@ -29,10 +29,11 @@ var _ = Describe("WhereClause", func() {
 		It("rewrites the query successfully", func(ctx SpecContext) {
 			query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
 			querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+
 			Expect(err).NotTo(HaveOccurred())
-			Expect(querySQL).To(ContainSubstring("role=$5"))
-			Expect(queryArgs).To(HaveLen(5))
-			Expect(queryArgs).To(ContainElement("admin"))
+			Expect(querySQL).To(ContainSubstring("role_db=$5"))
+			Expect(querySQL).To(ContainSubstring("company_db like $6"))
+			Expect(queryArgs).To(HaveLen(6))
 		})
 
 		When("the expression is empty", func() {

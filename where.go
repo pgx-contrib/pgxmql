@@ -45,6 +45,8 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 			}
 		}
 
+		fmt.Println(clause.Condition, clause.Args)
+
 		if strings.Contains(query, "$1") {
 			clause.Condition = x.replaceArgs(clause.Condition, len(args))
 		}
@@ -84,8 +86,13 @@ func (x *WhereClause) replaceArgs(query string, delta int) string {
 }
 
 func (x *WhereClause) options() []mql.Option {
-	include := make(map[string]string)
+	table := make(map[string]string)
+	model := make(map[string]string)
 	exclude := []string{}
+
+	key := func(name string) string {
+		return strings.ReplaceAll(strings.ToLower(name), "-", "")
+	}
 
 	// Get the type of the struct
 	t := reflect.TypeOf(x.Model)
@@ -98,16 +105,22 @@ func (x *WhereClause) options() []mql.Option {
 		// Iterate over struct fields
 		for i := range t.NumField() {
 			field := t.Field(i)
+			fname := key(field.Name)
+
+			// let's find the json prop
+			prop := field.Tag.Get("json")
+			if prop != "" && prop != "-" {
+				// maps the json property to the model property
+				model[prop] = fname
+			}
 
 			// let's find the column name
 			column := field.Tag.Get("db")
 			if column != "" && column != "-" {
-				// let's find the json property
-				property := field.Tag.Get("json")
-				if property != "" && property != "-" {
-					include[property] = column
-				}
+				// map the field to the table column
+				table[fname] = column
 			} else {
+				// if the db tag is empty, we exclude the field
 				exclude = append(exclude, field.Name)
 			}
 		}
@@ -115,7 +128,8 @@ func (x *WhereClause) options() []mql.Option {
 
 	return []mql.Option{
 		mql.WithPgPlaceholders(),
-		mql.WithTableColumnMap(include),
+		mql.WithColumnMap(model),
+		mql.WithTableColumnMap(table),
 		mql.WithIgnoredFields(exclude...),
 	}
 }
