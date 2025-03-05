@@ -1,4 +1,4 @@
-package pgxfilter_test
+package pgxmql_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pgx-contrib/pgxfilter"
+	"github.com/pgx-contrib/pgxmql"
 )
 
 func ExampleWhereClause() {
@@ -35,7 +35,7 @@ func ExampleWhereClause() {
 
 	rows, err := pool.Query(ctx,
 		"SELECT * from user WHERE $1:void IS NULL",
-		&pgxfilter.WhereClause{
+		&pgxmql.WhereClause{
 			Condition: "role = 'admin'",
 			Model:     User{},
 		},

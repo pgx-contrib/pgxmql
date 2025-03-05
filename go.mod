@@ -1,4 +1,4 @@
-module github.com/pgx-contrib/pgxfilter
+module github.com/pgx-contrib/pgxmql
 
 go 1.24.0
 

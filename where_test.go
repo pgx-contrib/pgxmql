@@ -1,11 +1,11 @@
-package pgxfilter_test
+package pgxmql_test
 
 import (
-	"github.com/pgx-contrib/pgxfilter"
+	"github.com/pgx-contrib/pgxmql"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/pgx-contrib/pgxfilter/fake"
+	. "github.com/pgx-contrib/pgxmql/fake"
 )
 
 var _ = Describe("WhereClause", func() {
@@ -16,10 +16,10 @@ var _ = Describe("WhereClause", func() {
 		Company  string `db:"-" json:"company"`
 	}
 
-	var clause *pgxfilter.WhereClause
+	var clause *pgxmql.WhereClause
 
 	BeforeEach(func() {
-		clause = &pgxfilter.WhereClause{
+		clause = &pgxmql.WhereClause{
 			Condition: "role = 'admin'",
 			Model:     &User{},
 		}

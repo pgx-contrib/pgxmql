@@ -1,4 +1,4 @@
-package pgxfilter
+package pgxmql
 
 import (
 	"context"

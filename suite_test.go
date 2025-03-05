@@ -1,4 +1,4 @@
-package pgxfilter_test
+package pgxmql_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestPgxfilter(t *testing.T) {
+func TestPgxMQL(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Pgxfilter Suite")
+	RunSpecs(t, "PgxMQL Suite")
 }
