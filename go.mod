@@ -1,12 +1,11 @@
 module github.com/pgx-contrib/pgxmql
 
 go 1.24.0
-
 require (
 	github.com/hashicorp/mql v0.1.5-0.20250304142029-e49b37f624f8
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/onsi/ginkgo/v2 v2.23.3
-	github.com/onsi/gomega v1.36.3
+	github.com/onsi/gomega v1.37.0
 )
 
 require (
