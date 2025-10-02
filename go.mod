@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/mql v0.1.5
 	github.com/jackc/pgx/v5 v5.7.6
-	github.com/onsi/ginkgo/v2 v2.25.3
+	github.com/onsi/ginkgo/v2 v2.26.0
 	github.com/onsi/gomega v1.38.2
 )
 
@@ -80,7 +80,7 @@ require (
 	github.com/goark/errs v1.3.2 // indirect
 	github.com/goark/gnkf v0.7.7 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/goccy/go-yaml v1.15.23 // indirect
+	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
