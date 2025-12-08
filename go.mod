@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/mql v0.1.5
 	github.com/jackc/pgx/v5 v5.7.6
-	github.com/onsi/ginkgo/v2 v2.27.2
+	github.com/onsi/ginkgo/v2 v2.27.3
 	github.com/onsi/gomega v1.38.2
 )
 
