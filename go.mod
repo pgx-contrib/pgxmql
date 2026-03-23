@@ -1,10 +1,10 @@
 module github.com/pgx-contrib/pgxmql
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/hashicorp/mql v0.1.5
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.9.1
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 )
