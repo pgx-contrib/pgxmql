@@ -63,5 +63,55 @@ var _ = Describe("WhereClause", func() {
 				Expect(queryArgs).To(BeEmpty())
 			})
 		})
+
+		When("the model is a non-pointer value", func() {
+			BeforeEach(func() {
+				clause.Model = User{}
+			})
+
+			It("rewrites the query successfully", func(ctx SpecContext) {
+				query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
+				querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(querySQL).To(ContainSubstring("role_db=$5"))
+				Expect(querySQL).To(ContainSubstring("company_db like $6"))
+				Expect(queryArgs).To(HaveLen(6))
+			})
+		})
+
+		When("the model has no db tags", func() {
+			BeforeEach(func() {
+				type NoTagModel struct {
+					ID   string
+					Name string
+				}
+				clause = &pgxmql.WhereClause{
+					Condition: "",
+					Model:     &NoTagModel{},
+				}
+			})
+
+			It("rewrites the query with TRUE", func(ctx SpecContext) {
+				query := NewFakeQuery("001.sql", "007", "Google", nil, nil)
+				querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, query.SQL, query.Arguments)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(querySQL).To(ContainSubstring("TRUE"))
+				Expect(queryArgs).To(HaveLen(4))
+			})
+		})
+
+		When("the query has no params besides the void placeholder", func() {
+			It("rewrites the query without shifting clause args", func(ctx SpecContext) {
+				rawQuery := "SELECT * FROM users WHERE $1::void IS NULL"
+				querySQL, queryArgs, err := clause.RewriteQuery(ctx, nil, rawQuery, nil)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(querySQL).To(ContainSubstring("role_db=$1"))
+				Expect(querySQL).To(ContainSubstring("company_db like $2"))
+				Expect(queryArgs).To(HaveLen(2))
+			})
+		})
 	})
 })

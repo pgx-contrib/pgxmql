@@ -45,8 +45,6 @@ func (x *WhereClause) RewriteQuery(ctx context.Context, _ *pgx.Conn, query strin
 			}
 		}
 
-		fmt.Println(clause.Condition, clause.Args)
-
 		if strings.Contains(query, "$1") {
 			clause.Condition = x.replaceArgs(clause.Condition, len(args))
 		}

@@ -34,7 +34,7 @@ func ExampleWhereClause() {
 	defer pool.Close()
 
 	rows, err := pool.Query(ctx,
-		"SELECT * from user WHERE $1:void IS NULL",
+		"SELECT * from user WHERE $1::void IS NULL",
 		&pgxmql.WhereClause{
 			Condition: "role = 'admin'",
 			Model:     User{},
